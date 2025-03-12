@@ -1,25 +1,23 @@
 package com.example.vr_ar_5task
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import android.util.Log
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
-class ProductViewModel : ViewModel() {
+class ProductViewModel(application: Application) : AndroidViewModel(application) {
+    private val repository = ProductRepository(
+        AppDatabase.getDatabase(application).productDao()
+    )
 
-    private val _products = MutableLiveData<List<Product>>()
-    val products: LiveData<List<Product>> get() = _products
+    val products: Flow<List<Product>> = repository.getProductsFlow()
 
-    fun fetchProducts() {
+    fun refresh() {
         viewModelScope.launch {
-            try {
-                val response = RetrofitClient.instance.getAllProducts()
-                _products.value = response.products
-            } catch (e: Exception) {
-                // Обработка ошибок (можно оставить для отладки в будущем)
-                e.printStackTrace()
-            }
+            repository.refreshProducts()
         }
     }
 }

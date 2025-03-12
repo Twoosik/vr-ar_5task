@@ -1,32 +1,37 @@
 package com.example.vr_ar_5task
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import com.example.vr_ar_5task.databinding.ActivityMainBinding
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 class MainActivity : AppCompatActivity() {
-
-    private val viewModel: ProductViewModel by viewModels()
-
-    private lateinit var adapter: ProductAdapter
+    private lateinit var binding: ActivityMainBinding
+    private val vm: ProductViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
-        recyclerView.layoutManager = LinearLayoutManager(this)
-        adapter = ProductAdapter()
-        recyclerView.adapter = adapter
+        setupRecyclerView()
+        setupObservers()
+        vm.refresh()
+    }
 
-        // Загружаем данные
-        viewModel.fetchProducts()
+    private fun setupRecyclerView() {
+        binding.recyclerView.layoutManager = LinearLayoutManager(this)
+        binding.recyclerView.adapter = ProductAdapter()
+    }
 
-        // Наблюдаем за изменениями в данных
-        viewModel.products.observe(this, { products ->
-            products?.let { adapter.submitList(it) }
-        })
+    private fun setupObservers() {
+        vm.products.onEach { products ->
+            (binding.recyclerView.adapter as ProductAdapter).submitList(products)
+        }.launchIn(lifecycleScope)
     }
 }

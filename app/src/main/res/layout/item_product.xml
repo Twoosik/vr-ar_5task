@@ -1,4 +1,3 @@
-<!-- res/layout/item_product.xml -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -18,6 +17,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Price: $0"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/tvBrand"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Brand: Unknown"
         android:textSize="16sp" />
 
 </LinearLayout>
